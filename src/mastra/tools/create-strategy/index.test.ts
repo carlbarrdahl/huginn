@@ -1,23 +1,20 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { mockStrategyCreate } = vi.hoisted(() => ({
-  mockStrategyCreate: vi.fn().mockResolvedValue({
-    strategy: "0xStrategyDeployed00000000000000000000000001",
-    config: {},
-  }),
-}));
+let mockStrategyCreate: ReturnType<typeof vi.fn>;
 
 vi.mock("../../lib/clients", () => ({
-  createClients: vi.fn().mockReturnValue({
-    walletClient: { chain: { id: 31337 } },
-    account: { address: "0xAgent" },
-    chainId: 31337,
-  }),
+  walletClient: { chain: { id: 31337 } },
+  agentAddress: "0xAgent",
+  chainId: 31337,
 }));
 
 vi.mock("@curator-studio/sdk", () => ({
   CuratorSDK: vi.fn().mockImplementation(function (this: any) {
-    this.strategy = { create: mockStrategyCreate };
+    this.strategy = {
+      get create() {
+        return mockStrategyCreate;
+      },
+    };
     this.tenant = undefined;
   }),
   createUploadFn: vi.fn().mockReturnValue(async () => "data:application/json;base64,e30="),
@@ -26,6 +23,13 @@ vi.mock("@curator-studio/sdk", () => ({
 const { createStrategy } = await import("./index");
 
 describe("createStrategy tool", () => {
+  beforeEach(() => {
+    mockStrategyCreate = vi.fn().mockResolvedValue({
+      strategy: "0xStrategyDeployed00000000000000000000000001",
+      config: {},
+    });
+  });
+
   it("deploys a strategy and returns its address", async () => {
     const result = await createStrategy.execute({
       allocations: [
@@ -37,7 +41,6 @@ describe("createStrategy tool", () => {
   });
 
   it("converts weights to bigint", async () => {
-    mockStrategyCreate.mockClear();
     await createStrategy.execute({
       allocations: [{ recipient: "0xabc000000000000000000000000000000000001", weight: 10000, label: "viem" }],
     });
@@ -46,7 +49,6 @@ describe("createStrategy tool", () => {
   });
 
   it("uses provided title in metadata", async () => {
-    mockStrategyCreate.mockClear();
     await createStrategy.execute({
       allocations: [{ recipient: "0xabc000000000000000000000000000000000001", weight: 10000, label: "viem" }],
       title: "viem Dependency Funding",
@@ -56,7 +58,6 @@ describe("createStrategy tool", () => {
   });
 
   it("merges duplicate recipients (monorepo siblings)", async () => {
-    mockStrategyCreate.mockClear();
     const shared = "0xMonoRepo0000000000000000000000000000001";
     await createStrategy.execute({
       allocations: [
@@ -70,9 +71,7 @@ describe("createStrategy tool", () => {
     const call = mockStrategyCreate.mock.calls[0][0];
     expect(call.allocations).toHaveLength(2);
 
-    const merged = call.allocations.find(
-      (a: any) => a.recipient === shared
-    );
+    const merged = call.allocations.find((a: any) => a.recipient === shared);
     expect(merged.weight).toBe(1000n);
     expect(merged.label).toBe("@lodestar/api + 2 more");
   });

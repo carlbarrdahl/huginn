@@ -3,6 +3,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
 
+vi.mock("../../lib/clients", () => ({
+  agentAddress: "0xAgent",
+}));
+
 const { analyzeDeps } = await import("./index");
 
 const MOCK_LATEST = { version: "2.47.4" };

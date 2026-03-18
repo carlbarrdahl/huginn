@@ -26,11 +26,8 @@ vi.mock("@ethereum-entity-registry/sdk", async (importOriginal) => {
 });
 
 vi.mock("../../lib/clients", () => ({
-  createClients: vi.fn().mockReturnValue({
-    walletClient: { chain: { id: 31337 } },
-    chainId: 31337,
-  }),
-  
+  walletClient: { chain: { id: 31337 } },
+  chainId: 31337,
 }));
 
 const { resolveEntity } = await import("./index");

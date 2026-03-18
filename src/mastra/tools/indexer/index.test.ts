@@ -1,11 +1,12 @@
-import { describe, it, expect, vi, beforeAll } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 const mockStrategyGet = vi.fn();
 const mockStrategyQuery = vi.fn();
 const mockBalanceQuery = vi.fn();
 const mockDistributionQuery = vi.fn();
 
-vi.stubEnv("CURATOR_INDEXER_URL", "http://test/graphql");
+// Set env var before dynamic import so createIndexer() sees it at module load time
+process.env.CURATOR_INDEXER_URL = "http://test/graphql";
 
 vi.mock("@curator-studio/sdk", () => ({
   createIndexer: vi.fn().mockReturnValue({

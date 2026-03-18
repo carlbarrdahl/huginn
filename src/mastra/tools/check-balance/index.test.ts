@@ -1,26 +1,29 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { mockBalanceOf } = vi.hoisted(() => ({
-  mockBalanceOf: vi.fn().mockResolvedValue(BigInt("5000000000000000000")),
-}));
+let mockBalanceOf: ReturnType<typeof vi.fn>;
 
 vi.mock("../../lib/clients", () => ({
-  createClients: vi.fn().mockReturnValue({
-    walletClient: { chain: { id: 31337 } },
-    chainId: 31337,
-  }),
-  
+  walletClient: { chain: { id: 31337 } },
+  chainId: 31337,
 }));
 
 vi.mock("@curator-studio/sdk", () => ({
   CuratorSDK: vi.fn().mockImplementation(function (this: any) {
-    this.strategy = { balanceOf: mockBalanceOf };
+    this.strategy = {
+      get balanceOf() {
+        return mockBalanceOf;
+      },
+    };
   }),
 }));
 
 const { checkBalance } = await import("./index");
 
 describe("checkBalance tool", () => {
+  beforeEach(() => {
+    mockBalanceOf = vi.fn().mockResolvedValue(BigInt("5000000000000000000"));
+  });
+
   it("returns balance as string", async () => {
     const result = await checkBalance.execute({
       strategyAddress: "0xStrategy",
