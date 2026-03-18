@@ -1,34 +1,35 @@
-import { createPublicClient, createWalletClient, http } from "viem";
+import { createPublicClient, createWalletClient, http, type Chain } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { hardhat, baseSepolia } from "viem/chains";
 
-const CHAINS = {
-  31337: { chain: hardhat,    rpcUrl: () => process.env.HARDHAT_RPC_URL ?? "http://127.0.0.1:8545" },
-  84532: { chain: baseSepolia, rpcUrl: () => process.env.BASE_SEPOLIA_RPC_URL },
-} as const;
+const chains: Record<number, { chain: Chain; rpcUrl: string }> = {
+  31337: {
+    chain: hardhat,
+    rpcUrl: process.env.HARDHAT_RPC_URL || "http://127.0.0.1:8545",
+  },
+  84532: {
+    chain: baseSepolia,
+    rpcUrl: process.env.BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org",
+  },
+};
 
-export type SupportedChainId = keyof typeof CHAINS;
+export const chainId = Number(process.env.CHAIN_ID || 31337);
+const { chain, rpcUrl } = chains[chainId] ?? chains[31337]!;
 
-export function getChainId(): SupportedChainId {
-  const id = parseInt(process.env.CHAIN_ID ?? "31337") as SupportedChainId;
-  if (!(id in CHAINS)) {
-    throw new Error(`Unsupported CHAIN_ID: ${id}. Use: ${Object.keys(CHAINS).join(", ")}`);
-  }
-  return id;
-}
+const account = privateKeyToAccount(
+  process.env.AGENT_PRIVATE_KEY as `0x${string}`,
+);
 
-export function createClients() {
-  const chainId = getChainId();
-  const { chain, rpcUrl } = CHAINS[chainId];
+export const walletClient = createWalletClient({
+  account,
+  chain,
+  transport: http(rpcUrl),
+});
 
-  const privateKey = process.env.AGENT_PRIVATE_KEY;
-  if (!privateKey) throw new Error("AGENT_PRIVATE_KEY is required");
+export const publicClient = createPublicClient({
+  chain,
+  transport: http(rpcUrl),
+});
 
-  const account = privateKeyToAccount(privateKey as `0x${string}`);
-  const transport = http(rpcUrl());
-
-  const walletClient = createWalletClient({ account, chain, transport });
-  const publicClient = createPublicClient({ chain, transport });
-
-  return { walletClient, publicClient, account, chainId };
-}
+export const agentAddress = account.address;
+export { chain };
