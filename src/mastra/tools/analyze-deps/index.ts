@@ -2,6 +2,7 @@ import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
 import { calculateWeights, normalizeWeights, type RawDep, type WeightedDep } from "./weights";
 import { batchResolveNpmToGithub } from "../../lib/npm";
+import { agentAddress } from "../../lib/clients";
 
 const DEPS_DEV_API = "https://deps.dev/_/s/npm/p";
 const NPM_REGISTRY_API = "https://registry.npmjs.org";
@@ -94,7 +95,7 @@ function aggregateByIdentifier(deps: WeightedDep[]): WeightedDep[] {
 export const analyzeDeps = createTool({
   id: "analyze-deps",
   description:
-    "Analyze an npm package's dependency tree via deps.dev, resolve npm→GitHub to dedup monorepo siblings, and return weighted allocations capped to maxAllocations. Uses composite formula: distance decay × graph in-degree × subtree size.",
+    "Analyze an npm package's dependency tree via deps.dev, resolve npm→GitHub to dedup monorepo siblings, and return weighted allocations capped to maxAllocations. Uses composite formula: distance decay × graph in-degree × subtree size. After calling this tool, write a concise markdown description summarizing the results and pass it to create-strategy.",
   inputSchema: z.object({
     packageName: z.string().describe("npm package name (e.g. 'viem')"),
     version: z.string().optional().describe("Package version — defaults to latest"),
@@ -123,7 +124,6 @@ export const analyzeDeps = createTool({
       weight: z.number(),
       bps: z.number(),
     }),
-    rationale: z.string().describe("Human-readable summary of the analysis — pass to create-strategy as description"),
   }),
   execute: async ({ packageName, version, agentFeeBps, rootShareBps, maxAllocations }) => {
     const resolvedVersion = version ?? (await fetchLatestVersion(packageName));
@@ -226,20 +226,6 @@ export const analyzeDeps = createTool({
       });
     }
 
-    const topNames = allocations
-      .filter(a => a.name !== packageName && !a.name.includes("other dependencies"))
-      .slice(0, 5)
-      .map(a => `${a.name} (${(a.weight / 100).toFixed(1)}%)`);
-
-    const rationale = [
-      `Dependency analysis for ${packageName}@${resolvedVersion}.`,
-      `${rawDeps.length} total deps (${graph.directCount} direct, ${graph.indirectCount} indirect) collapsed to ${uniqueEntities} unique entities after npm→GitHub dedup.`,
-      `Weights: composite formula (1/distance) × (1 + inDegree) × (1 + ln(1 + subtreeSize)).`,
-      rootShareBps > 0 ? `Root package receives fixed ${(rootShareBps / 100).toFixed(0)}% share.` : null,
-      `Top allocations: ${topNames.join(", ")}.`,
-      `Agent fee: ${(agentFeeBps / 100).toFixed(1)}%.`,
-    ].filter(Boolean).join(" ");
-
     return {
       package: packageName,
       version: resolvedVersion,
@@ -249,11 +235,10 @@ export const analyzeDeps = createTool({
       indirectCount: graph.indirectCount,
       allocations,
       agentFee: {
-        recipient: process.env.AGENT_WALLET_ADDRESS ?? "0x0000000000000000000000000000000000000000",
+        recipient: agentAddress,
         weight: agentFeeBps,
         bps: agentFeeBps,
       },
-      rationale,
     };
   },
 });
