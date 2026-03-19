@@ -38,6 +38,9 @@ importers:
       '@types/node-telegram-bot-api':
         specifier: ^0.64.14
         version: 0.64.14
+      dotenv:
+        specifier: ^17.0.0
+        version: 17.3.1
       hono:
         specifier: ^4.12.5
         version: 4.12.8
