@@ -1,20 +1,8 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
-import { CuratorSDK, createUploadFn, type SupportedChainId } from "@curator-studio/sdk";
 import { zeroAddress } from "viem";
-import { walletClient, agentAddress, chainId } from "../../lib/clients";
-
-const uploadMetadata = createUploadFn(
-  process.env.CURATOR_UPLOAD_URL!,
-  process.env.CURATOR_UPLOAD_SECRET!,
-);
-
-const sdk = new CuratorSDK(walletClient, {
-  chain: chainId as SupportedChainId,
-  tenant: process.env.CURATOR_TENANT,
-  indexerUrl: process.env.CURATOR_INDEXER_URL,
-  uploadMetadata,
-});
+import { agentAddress } from "../../lib/clients";
+import { sdk } from "../../lib/curator";
 
 async function resolveEnsLabel(title: string): Promise<string> {
   const base = title
@@ -92,15 +80,15 @@ export const createStrategy = createTool({
         label: a.label,
       })),
       metadata: {
-        title: title ?? "Huginn Dependency Fund",
+        title,
         ...(description && { description }),
       },
-      ensLabel: await resolveEnsLabel(title ?? "Huginn Dependency Fund"),
+      ensLabel: await resolveEnsLabel(title),
     });
 
     return {
       strategyAddress: result.strategy,
-      title: title ?? "Huginn Dependency Fund",
+      title,
     };
   },
 });

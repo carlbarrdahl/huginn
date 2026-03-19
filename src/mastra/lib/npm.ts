@@ -1,5 +1,12 @@
 const NPM_REGISTRY_API = "https://registry.npmjs.org";
 
+export async function fetchLatestVersion(packageName: string): Promise<string> {
+  const res = await fetch(`${NPM_REGISTRY_API}/${encodeURIComponent(packageName)}/latest`);
+  if (!res.ok) throw new Error(`npm registry error ${res.status}: ${packageName}`);
+  const data = await res.json();
+  return data.version as string;
+}
+
 export async function resolveNpmToGithub(packageName: string): Promise<string | null> {
   try {
     const res = await fetch(`${NPM_REGISTRY_API}/${encodeURIComponent(packageName)}`);

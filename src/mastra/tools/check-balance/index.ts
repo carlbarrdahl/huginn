@@ -1,12 +1,6 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
-import { CuratorSDK, type SupportedChainId } from "@curator-studio/sdk";
-import { walletClient, chainId } from "../../lib/clients";
-
-const sdk = new CuratorSDK(walletClient, {
-  chain: chainId as SupportedChainId,
-  indexerUrl: process.env.CURATOR_INDEXER_URL,
-});
+import { sdk } from "../../lib/curator";
 
 export const checkBalance = createTool({
   id: "check-balance",

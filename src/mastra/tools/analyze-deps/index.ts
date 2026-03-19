@@ -1,18 +1,10 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
 import { calculateWeights, normalizeWeights, type RawDep, type WeightedDep } from "./weights";
-import { batchResolveNpmToGithub } from "../../lib/npm";
+import { fetchLatestVersion, batchResolveNpmToGithub } from "../../lib/npm";
 import { agentAddress } from "../../lib/clients";
 
 const DEPS_DEV_API = "https://deps.dev/_/s/npm/p";
-const NPM_REGISTRY_API = "https://registry.npmjs.org";
-
-async function fetchLatestVersion(packageName: string): Promise<string> {
-  const res = await fetch(`${NPM_REGISTRY_API}/${encodeURIComponent(packageName)}/latest`);
-  if (!res.ok) throw new Error(`npm registry error ${res.status}: ${packageName}`);
-  const data = await res.json();
-  return data.version as string;
-}
 
 type DepsDotDevDep = {
   package: { system: string; name: string };
