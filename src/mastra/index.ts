@@ -8,6 +8,7 @@ import { createStrategy } from "./tools/create-strategy";
 import { fundStrategy } from "./tools/fund-strategy";
 import { distribute } from "./tools/distribute";
 import { checkBalance } from "./tools/check-balance";
+import { checkOwnBalance } from "./tools/check-own-balance";
 import { listStrategies, getStrategy, strategyBalances, listDistributions } from "./tools/indexer";
 export { memory } from "./memory";
 
@@ -21,6 +22,7 @@ export const mastra = new Mastra({
     "fund-strategy": fundStrategy,
     distribute,
     "check-balance": checkBalance,
+    "check-own-balance": checkOwnBalance,
     "list-strategies": listStrategies,
     "get-strategy": getStrategy,
     "strategy-balances": strategyBalances,

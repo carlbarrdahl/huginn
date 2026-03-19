@@ -6,6 +6,7 @@ import { createStrategy } from "../tools/create-strategy";
 import { fundStrategy } from "../tools/fund-strategy";
 import { distribute } from "../tools/distribute";
 import { checkBalance } from "../tools/check-balance";
+import { checkOwnBalance } from "../tools/check-own-balance";
 import { listStrategies, getStrategy, strategyBalances, listDistributions } from "../tools/indexer";
 import { memory } from "../memory";
 
@@ -41,6 +42,7 @@ Be direct and technical. Report results clearly with addresses and weights.`,
     "fund-strategy": fundStrategy,
     distribute,
     "check-balance": checkBalance,
+    "check-own-balance": checkOwnBalance,
     "list-strategies": listStrategies,
     "get-strategy": getStrategy,
     "strategy-balances": strategyBalances,
