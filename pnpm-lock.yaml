@@ -12,8 +12,8 @@ importers:
         specifier: ^0.1.2
         version: 0.1.2(@tanstack/react-query@5.91.0(react@19.2.4))(graphql@16.13.1)(react@19.2.4)(sonner@2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)(viem@2.47.5(typescript@5.9.3)(zod@4.3.6))(wagmi@3.5.0(@tanstack/query-core@5.91.0)(@tanstack/react-query@5.91.0(react@19.2.4))(ox@0.14.5(typescript@5.9.3)(zod@4.3.6))(react@19.2.4)(typescript@5.9.3)(viem@2.47.5(typescript@5.9.3)(zod@4.3.6)))(zod@4.3.6)
       '@ethereum-entity-registry/sdk':
-        specifier: ^0.3.0
-        version: 0.3.0(@tanstack/react-query@5.91.0(react@19.2.4))(graphql@16.13.1)(react@19.2.4)(sonner@2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)(viem@2.47.5(typescript@5.9.3)(zod@4.3.6))(wagmi@3.5.0(@tanstack/query-core@5.91.0)(@tanstack/react-query@5.91.0(react@19.2.4))(ox@0.14.5(typescript@5.9.3)(zod@4.3.6))(react@19.2.4)(typescript@5.9.3)(viem@2.47.5(typescript@5.9.3)(zod@4.3.6)))
+        specifier: ^0.3.2
+        version: 0.3.2(@tanstack/react-query@5.91.0(react@19.2.4))(graphql@16.13.1)(react@19.2.4)(sonner@2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)(viem@2.47.5(typescript@5.9.3)(zod@4.3.6))(wagmi@3.5.0(@tanstack/query-core@5.91.0)(@tanstack/react-query@5.91.0(react@19.2.4))(ox@0.14.5(typescript@5.9.3)(zod@4.3.6))(react@19.2.4)(typescript@5.9.3)(viem@2.47.5(typescript@5.9.3)(zod@4.3.6)))
       '@hono/node-server':
         specifier: ^1.19.11
         version: 1.19.11(hono@4.12.8)
@@ -476,8 +476,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@ethereum-entity-registry/sdk@0.3.0':
-    resolution: {integrity: sha512-IpOc7p0W3Magw39x9jTrU+lq1fpPQbwhcj2Fr9U+chWbhCcYevjwbWln8FD7XfDjIn1EUWSro0iIAMttzRcXtQ==}
+  '@ethereum-entity-registry/sdk@0.3.2':
+    resolution: {integrity: sha512-jZdpKH3lxGFfajgyVrxgDvVja0EUfZaWcPYj3FUdWwUI4BBAXxSMEdoJLmSU9GSjyudICokS+91/NS+y7gFV7w==}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
       react: ^19.2.4
@@ -4059,7 +4059,7 @@ snapshots:
   '@esbuild/win32-x64@0.27.4':
     optional: true
 
-  '@ethereum-entity-registry/sdk@0.3.0(@tanstack/react-query@5.91.0(react@19.2.4))(graphql@16.13.1)(react@19.2.4)(sonner@2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)(viem@2.47.5(typescript@5.9.3)(zod@4.3.6))(wagmi@3.5.0(@tanstack/query-core@5.91.0)(@tanstack/react-query@5.91.0(react@19.2.4))(ox@0.14.5(typescript@5.9.3)(zod@4.3.6))(react@19.2.4)(typescript@5.9.3)(viem@2.47.5(typescript@5.9.3)(zod@4.3.6)))':
+  '@ethereum-entity-registry/sdk@0.3.2(@tanstack/react-query@5.91.0(react@19.2.4))(graphql@16.13.1)(react@19.2.4)(sonner@2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)(viem@2.47.5(typescript@5.9.3)(zod@4.3.6))(wagmi@3.5.0(@tanstack/query-core@5.91.0)(@tanstack/react-query@5.91.0(react@19.2.4))(ox@0.14.5(typescript@5.9.3)(zod@4.3.6))(react@19.2.4)(typescript@5.9.3)(viem@2.47.5(typescript@5.9.3)(zod@4.3.6)))':
     dependencies:
       '@tanstack/react-query': 5.91.0(react@19.2.4)
       '@urql/core': 6.0.1(graphql@16.13.1)
