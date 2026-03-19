@@ -79,6 +79,7 @@ Set `TELEGRAM_BOT_TOKEN` and run the server. The bot:
 | `fund-strategy` | Transfer ERC-20 or native ETH to a strategy |
 | `distribute` | Split strategy balance to all recipients |
 | `check-balance` | Check token balance held by a strategy |
+| `check-own-balance` | Check the agent's own ETH or ERC-20 balance |
 | `list-strategies` | Browse deployed strategies |
 | `get-strategy` | Get full details for a strategy |
 | `strategy-balances` | Token balances per strategy |
