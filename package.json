@@ -7,7 +7,7 @@
     "build": "mastra build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "start": "tsx src/telegram.ts"
+    "start": "tsx src/index.ts"
   },
   "dependencies": {
     "@curator-studio/sdk": "^0.1.2",
