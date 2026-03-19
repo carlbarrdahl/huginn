@@ -6,7 +6,8 @@
     "dev:server": "tsx watch --env-file .env.local src/index.ts",
     "build": "mastra build",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "start": "tsx src/telegram.ts"
   },
   "dependencies": {
     "@curator-studio/sdk": "^0.1.2",
