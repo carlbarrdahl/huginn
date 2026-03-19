@@ -31,3 +31,4 @@ lerna-debug.log*
 .env.local
 .agents
 .claude
+mastra.db*
