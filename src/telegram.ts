@@ -28,11 +28,21 @@ function markdownToHtml(text: string): string {
 }
 
 
-type Section = { type: "text"; content: string } | { type: "html"; content: string };
+type Section =
+  | { type: "text"; content: string }
+  | { type: "html"; content: string }
+  | { type: "tool-call"; toolName: string; count: number };
 
 function renderSections(sections: Section[]): string {
   return sections
-    .map(s => (s.type === "text" ? markdownToHtml(s.content) : s.content))
+    .map(s => {
+      if (s.type === "text") return markdownToHtml(s.content);
+      if (s.type === "tool-call") {
+        const label = s.count > 1 ? ` x${s.count}` : "";
+        return `<i>🛠 ${htmlEscape(s.toolName)}${label}…</i>\n`;
+      }
+      return s.content;
+    })
     .join("");
 }
 
@@ -109,12 +119,16 @@ export class TelegramIntegration {
             }
             break;
           }
-          case "tool-call":
-            sections.push({
-              type: "html",
-              content: `<i>🛠 ${htmlEscape(chunk.payload.toolName)}…</i>\n`,
-            });
+          case "tool-call": {
+            const toolName = chunk.payload.toolName;
+            const last = sections[sections.length - 1];
+            if (last?.type === "tool-call" && last.toolName === toolName) {
+              last.count++;
+            } else {
+              sections.push({ type: "tool-call", toolName, count: 1 });
+            }
             break;
+          }
           case "error":
             sections.push({
               type: "html",
