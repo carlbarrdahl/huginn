@@ -83,7 +83,7 @@ export const createStrategy = createTool({
         title,
         ...(description && { description }),
       },
-      ensLabel: await resolveEnsLabel(title),
+      // ensLabel: await resolveEnsLabel(title),
     });
 
     return {
