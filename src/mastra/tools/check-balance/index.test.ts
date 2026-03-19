@@ -2,19 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 let mockBalanceOf: ReturnType<typeof vi.fn>;
 
-vi.mock("../../lib/clients", () => ({
-  walletClient: { chain: { id: 31337 } },
-  chainId: 31337,
-}));
-
-vi.mock("@curator-studio/sdk", () => ({
-  CuratorSDK: vi.fn().mockImplementation(function (this: any) {
-    this.strategy = {
+vi.mock("../../lib/curator", () => ({
+  sdk: {
+    strategy: {
       get balanceOf() {
         return mockBalanceOf;
       },
-    };
-  }),
+    },
+  },
 }));
 
 const { checkBalance } = await import("./index");

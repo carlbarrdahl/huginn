@@ -4,19 +4,14 @@ const MOCK_HASH = "0xdistributetxhash0000000000000000000000000000000000000000000
 
 let mockDistribute: ReturnType<typeof vi.fn>;
 
-vi.mock("../../lib/clients", () => ({
-  walletClient: { chain: { id: 31337 } },
-  chainId: 31337,
-}));
-
-vi.mock("@curator-studio/sdk", () => ({
-  CuratorSDK: vi.fn().mockImplementation(function (this: any) {
-    this.strategy = {
+vi.mock("../../lib/curator", () => ({
+  sdk: {
+    strategy: {
       get distribute() {
         return mockDistribute;
       },
-    };
-  }),
+    },
+  },
 }));
 
 const { distribute } = await import("./index");

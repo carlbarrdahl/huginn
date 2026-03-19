@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 let mockStrategyCreate: ReturnType<typeof vi.fn>;
+let mockEnsAvailable: ReturnType<typeof vi.fn>;
 
 vi.mock("../../lib/clients", () => ({
   walletClient: { chain: { id: 31337 } },
@@ -8,16 +9,19 @@ vi.mock("../../lib/clients", () => ({
   chainId: 31337,
 }));
 
-vi.mock("@curator-studio/sdk", () => ({
-  CuratorSDK: vi.fn().mockImplementation(function (this: any) {
-    this.strategy = {
+vi.mock("../../lib/curator", () => ({
+  sdk: {
+    strategy: {
       get create() {
         return mockStrategyCreate;
       },
-    };
-    this.tenant = undefined;
-  }),
-  createUploadFn: vi.fn().mockReturnValue(async () => "data:application/json;base64,e30="),
+    },
+    ens: {
+      get available() {
+        return mockEnsAvailable;
+      },
+    },
+  },
 }));
 
 const { createStrategy } = await import("./index");
@@ -28,6 +32,7 @@ describe("createStrategy tool", () => {
       strategy: "0xStrategyDeployed00000000000000000000000001",
       config: {},
     });
+    mockEnsAvailable = vi.fn().mockResolvedValue(true);
   });
 
   it("deploys a strategy and returns its address", async () => {
@@ -48,13 +53,25 @@ describe("createStrategy tool", () => {
     expect(call.allocations[0].weight).toBe(10000n);
   });
 
-  it("uses provided title in metadata", async () => {
+  it("uses provided title in metadata and ENS label", async () => {
     await createStrategy.execute({
       allocations: [{ recipient: "0xabc000000000000000000000000000000000001", weight: 10000, label: "viem" }],
       title: "viem Dependency Funding",
     });
     const call = mockStrategyCreate.mock.calls[0][0];
     expect(call.metadata.title).toBe("viem Dependency Funding");
+    expect(call.ensLabel).toBe("viem-dependency-funding");
+  });
+
+  it("falls back to timestamp ENS label when all candidates are taken", async () => {
+    mockEnsAvailable = vi.fn().mockResolvedValue(false);
+
+    await createStrategy.execute({
+      allocations: [{ recipient: "0xabc000000000000000000000000000000000001", weight: 10000, label: "viem" }],
+      title: "viem Dependency Funding",
+    });
+    const call = mockStrategyCreate.mock.calls[0][0];
+    expect(call.ensLabel).toMatch(/^huginn-\d+$/);
   });
 
   it("merges duplicate recipients (monorepo siblings)", async () => {
