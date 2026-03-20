@@ -4,29 +4,6 @@ import { zeroAddress } from "viem";
 import { agentAddress } from "../../lib/clients";
 import { sdk } from "../../lib/curator";
 
-async function resolveEnsLabel(title: string): Promise<string> {
-  const base = title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40);
-
-  const candidates = [
-    base,
-    ...Array.from({ length: 5 }, (_, i) => `${base}-${i + 1}`),
-  ];
-
-  for (const label of candidates) {
-    try {
-      if (await sdk.ens.available(label)) return label;
-    } catch {
-      break;
-    }
-  }
-
-  return `huginn-${Date.now()}`;
-}
-
 function aggregateByRecipient(
   allocations: { recipient: string; weight: number; label: string }[],
 ) {
@@ -49,10 +26,18 @@ function aggregateByRecipient(
   }));
 }
 
+function resolveStrategyTitle(title: string | undefined, packageName: string | undefined): string {
+  const t = title?.trim();
+  if (t) return t;
+  const pkg = packageName?.trim();
+  if (pkg) return `${pkg} Dependency Fund`;
+  return "Huginn Dependency Fund";
+}
+
 export const createStrategy = createTool({
   id: "create-strategy",
   description:
-    "Deploy a Curator Studio funding strategy on-chain with weighted allocations. Merges duplicate recipients.",
+    "Deploy a Curator Studio funding strategy on-chain with weighted allocations. Merges duplicate recipients. Pass packageName (same root package as analyze-deps / confirm-strategy) so metadata title matches the funded project when you omit title.",
   inputSchema: z.object({
     allocations: z.array(
       z.object({
@@ -61,15 +46,23 @@ export const createStrategy = createTool({
         label: z.string(),
       }),
     ),
-    title: z.string().optional().default("Huginn Dependency Fund"),
+    packageName: z
+      .string()
+      .optional()
+      .describe("Root npm package being funded — used for on-chain strategy title when title is omitted"),
+    title: z
+      .string()
+      .optional()
+      .describe("Override strategy display title; defaults to \"{packageName} Dependency Fund\""),
     description: z.string().optional().describe("Analysis rationale — stored in on-chain metadata"),
   }),
   outputSchema: z.object({
     strategyAddress: z.string(),
     title: z.string(),
   }),
-  execute: async ({ allocations, title, description }) => {
+  execute: async ({ allocations, packageName, title, description }) => {
     const merged = aggregateByRecipient(allocations);
+    const resolvedTitle = resolveStrategyTitle(title, packageName);
 
     const result = await sdk.strategy.create({
       owner: agentAddress,
@@ -80,15 +73,14 @@ export const createStrategy = createTool({
         label: a.label,
       })),
       metadata: {
-        title,
+        title: resolvedTitle,
         ...(description && { description }),
       },
-      // ensLabel: await resolveEnsLabel(title),
     });
 
     return {
       strategyAddress: result.strategy,
-      title,
+      title: resolvedTitle,
     };
   },
 });

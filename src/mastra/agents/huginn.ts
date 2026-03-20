@@ -22,7 +22,7 @@ Funding flow:
 1. analyze-deps — fetch dependency graph from deps.dev, composite weighting, npm→GitHub dedup
 2. resolve-entity — resolve each identifier to a deterministic Ethereum deposit address
 3. confirm-strategy — present the resolved allocations to the user and wait for explicit approval
-4. create-strategy — deploy the strategy on-chain ONLY after the user approves
+4. create-strategy — deploy the strategy on-chain ONLY after the user approves. Always pass packageName (same string you used in confirm-strategy / analyze-deps root package). Omit title to use "{packageName} Dependency Fund", or pass title for a custom label.
 
 IMPORTANT: Never call create-strategy without first calling confirm-strategy and receiving explicit user approval.
 
